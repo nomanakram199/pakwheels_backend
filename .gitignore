@@ -6,3 +6,8 @@ ERD.md
 /core/__pycache__
 /core/__pycache__
 HANDOFF.json
+/catalog/__pycache__
+/catalog/migrations/__pycache__
+/core/__pycache__
+/core/__pycache__
+/core/__pycache__
