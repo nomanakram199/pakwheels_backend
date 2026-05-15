@@ -47,6 +47,7 @@ THIRD_PARTY_APPS = [
 
 CUSTOM_APPS = [
     'users',
+    'catalog',
 ]   
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
