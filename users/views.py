@@ -1,10 +1,14 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+import logging
+
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from users.serializers import SignUpSerializer, OTPVerifySerializer, LoginSerializer, ResendOTPSerializer, UserResponseSerializer
-from users.models import User
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from users.serializers import SignUpSerializer, OTPVerifySerializer, LoginSerializer, ResendOTPSerializer, UserResponseSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class SignupAPIView(APIView):
@@ -26,6 +30,7 @@ class OTPVerifyAPIView(APIView):
     def post(self, request):
         serializer = OTPVerifySerializer(data=request.data)
         if serializer.is_valid():
+            serializer.save()
             return Response({
                 'message': 'Email verified successfully.',
             }, status=status.HTTP_200_OK)
@@ -56,8 +61,7 @@ class ResendOTPAPIView(APIView):
     def post(self, request):
         serializer = ResendOTPSerializer(data=request.data)
         if serializer.is_valid():
-            otp = serializer.validated_data['otp']
-            email = request.data.get('email')
+            serializer.save()
             return Response({
                 'message': 'OTP resent to your email.',
             }, status=status.HTTP_200_OK)
