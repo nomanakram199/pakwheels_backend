@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from cars.models import Car
-from catalog.serializers import ModelSerializer
+from catalog.serializers import ModelsSerializer
 from users.serializers import UserResponseSerializer
 
 
 class CarListSerializer(serializers.ModelSerializer):
-    model = ModelSerializer(read_only=True)
+    model = ModelsSerializer(read_only=True)
     seller = UserResponseSerializer(read_only=True)
 
     class Meta:
@@ -15,7 +15,7 @@ class CarListSerializer(serializers.ModelSerializer):
 
 
 class CarDetailSerializer(serializers.ModelSerializer):
-    model = ModelSerializer(read_only=True)
+    model = ModelsSerializer(read_only=True)
     seller = UserResponseSerializer(read_only=True)
 
     class Meta:

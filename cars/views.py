@@ -1,12 +1,19 @@
-from django.shortcuts import render
 
-# Create your views here.
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.exceptions import NotFound
 from cars.models import Car
+from catalog.models import Model as CarModel
 from cars.serializers import CarListSerializer, CarDetailSerializer, CarCreateUpdateSerializer
+
+
+def get_active_cars(filters=None):
+    query = Car.objects.filter(is_deleted=False).select_related('model', 'seller')
+    if filters:
+        query = query.filter(**filters)
+    return query
 
 
 class CarListAPIView(APIView):
@@ -16,7 +23,7 @@ class CarListAPIView(APIView):
         return [AllowAny()]
 
     def get(self, request):
-        cars = Car.objects.filter(is_deleted=False).select_related('model', 'seller')
+        cars = get_active_cars()
         serializer = CarListSerializer(cars, many=True)
         return Response(serializer.data)
 
@@ -73,7 +80,10 @@ class CarByModelAPIView(APIView):
         if not model_id:
             return Response({'error': 'model_id required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        cars = Car.objects.filter(model_id=model_id, is_deleted=False).select_related('model', 'seller')
+        if not CarModel.objects.filter(id=model_id).exists():
+            raise NotFound("Model not found.")
+
+        cars = get_active_cars({'model_id': model_id})
         serializer = CarListSerializer(cars, many=True)
         return Response(serializer.data)
 
@@ -82,7 +92,7 @@ class MyCarListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        cars = Car.objects.filter(seller=request.user, is_deleted=False).select_related('model', 'seller')
+        cars = get_active_cars({'seller': request.user})
         serializer = CarListSerializer(cars, many=True)
         return Response(serializer.data)
 

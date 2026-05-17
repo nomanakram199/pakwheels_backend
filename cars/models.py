@@ -1,14 +1,11 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
-from catalog.models import Model
+from catalog.models import Model as CarModel
 from users.models import User
 from cars.choices import CONDITION_CHOICES
 
- 
+
 class Car(models.Model):
-    model = models.ForeignKey(Model, on_delete=models.PROTECT, related_name='cars')
+    model = models.ForeignKey(CarModel, on_delete=models.PROTECT, related_name='cars')
     year = models.IntegerField()
     license_plate = models.CharField(max_length=20, unique=True)
     city = models.CharField(max_length=100)
