@@ -1,9 +1,12 @@
-from rest_framework import serializers
-from users.models import User
-from django.utils import timezone
 from datetime import timedelta
-import random
 import logging
+import random
+
+from django.utils import timezone
+from rest_framework import serializers
+from rest_framework.exceptions import NotFound
+
+from users.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +45,7 @@ class OTPVerifySerializer(serializers.Serializer):
         try:
             user = User.objects.get(email=data['email'])
         except User.DoesNotExist:
-            raise serializers.ValidationError("User not found.")
+            raise NotFound("User not found.")
 
         if user.is_verified:
             raise serializers.ValidationError("Email already verified.")
@@ -53,16 +56,17 @@ class OTPVerifySerializer(serializers.Serializer):
         if timezone.now() > user.otp_expires_at:
             raise serializers.ValidationError("OTP expired.")
 
-        user.is_verified = True
-        user.otp = None
-        user.otp_expires_at = None
-        user.save(update_fields=['is_verified', 'otp', 'otp_expires_at'])
         data['user'] = user
         return data
 
+    def save(self):
+        user = self.validated_data['user']
+        user.is_verified = True
+        user.save(update_fields=['is_verified'])
+        return user
+
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
@@ -88,20 +92,22 @@ class ResendOTPSerializer(serializers.Serializer):
         try:
             user = User.objects.get(email=data['email'])
         except User.DoesNotExist:
-            raise serializers.ValidationError("User not found.")
+            raise NotFound("User not found.")
 
         if user.is_verified:
             raise serializers.ValidationError("Email already verified.")
 
+        data['user'] = user
+        return data
+
+    def save(self):
+        user = self.validated_data['user']
         otp = str(random.randint(100000, 999999))
         user.otp = otp
-        print("OTP sent to your email:", otp)
         user.otp_expires_at = timezone.now() + timedelta(minutes=10)
+        logger.info(f"OTP sent to email {user.email}: {otp}")
         user.save(update_fields=['otp', 'otp_expires_at'])
-
-        data['user'] = user
-        data['otp'] = otp
-        return data
+        return user
 
 
 class UserResponseSerializer(serializers.ModelSerializer):
