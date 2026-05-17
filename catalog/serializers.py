@@ -9,7 +9,7 @@ class BrandSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at']
 
 
-class ModelSerializer(serializers.ModelSerializer):
+class ModelsSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
 
     class Meta:
