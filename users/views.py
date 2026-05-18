@@ -62,5 +62,3 @@ class ResendOTPAPIView(APIView):
         return Response({
             'message': 'OTP resent to your email.',
         }, status=status.HTTP_200_OK)
-
-
