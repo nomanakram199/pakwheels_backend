@@ -17,3 +17,5 @@ class ModelsSerializer(serializers.ModelSerializer):
         fields = ['id', 'brand', 'name', 'created_at']  
         read_only_fields = ['created_at']
 
+class ModelByBrandQuerySerializer(serializers.Serializer):
+    brand_id = serializers.IntegerField(required=True)

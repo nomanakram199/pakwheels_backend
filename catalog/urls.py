@@ -11,4 +11,3 @@ urlpatterns = [
     path('models/<int:model_id>/', ModelDetailAPIView.as_view(), name='model-detail'),
     path('models/by-brand/', ModelByBrandAPIView.as_view(), name='model-by-brand'),
 ]
-
