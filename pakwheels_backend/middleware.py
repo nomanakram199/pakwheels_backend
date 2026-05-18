@@ -14,4 +14,3 @@ class PerformanceMiddleware:
         response_time = end_time - start_time
         logger.info(f"API Request | Method: {request.method} | Path: {request.path} | Duration: {response_time:.3f}s | Response Size: {len(response.content)} bytes")
         return response
-
