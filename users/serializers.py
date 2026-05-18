@@ -17,6 +17,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         fields = ['email', 'password', 'phone_number', 'first_name', 'last_name', 'city']
         extra_kwargs = {
             'phone_number': {'required': True,'min_length': 8,},
+            'password': {'write_only': True},
             'city': {'required': True},
             'first_name': {'required': True},
             'last_name': {'required': True},
