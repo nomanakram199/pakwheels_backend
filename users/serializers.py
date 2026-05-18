@@ -67,6 +67,7 @@ class OTPVerifySerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
