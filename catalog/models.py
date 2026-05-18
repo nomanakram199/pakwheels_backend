@@ -25,4 +25,3 @@ class Model(models.Model):
 
     def __str__(self):
         return f"{self.brand.name} {self.name}"
-
