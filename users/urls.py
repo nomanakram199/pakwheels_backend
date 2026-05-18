@@ -7,4 +7,3 @@ urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='login'),
     path('resend-otp/', ResendOTPAPIView.as_view(), name='resend_otp'),
 ]
-
