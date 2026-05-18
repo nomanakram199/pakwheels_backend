@@ -17,6 +17,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         fields = ['email', 'password', 'phone_number', 'first_name', 'last_name', 'city']
         extra_kwargs = {
             'phone_number': {'required': True,'min_length': 8,},
+            'password': {'write_only': True},
             'city': {'required': True},
             'first_name': {'required': True},
             'last_name': {'required': True},
@@ -63,10 +64,10 @@ class OTPVerifySerializer(serializers.Serializer):
         user = self.validated_data['user']
         user.is_verified = True
         user.save(update_fields=['is_verified'])
-        return user
 
 
 class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
@@ -107,7 +108,6 @@ class ResendOTPSerializer(serializers.Serializer):
         user.otp_expires_at = timezone.now() + timedelta(minutes=10)
         logger.info(f"OTP sent to email {user.email}: {otp}")
         user.save(update_fields=['otp', 'otp_expires_at'])
-        return user
 
 
 class UserResponseSerializer(serializers.ModelSerializer):
