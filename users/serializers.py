@@ -1,11 +1,8 @@
 from datetime import timedelta
 import logging
 import random
-
 from django.utils import timezone
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound
-
 from users.models import User
 
 logger = logging.getLogger(__name__)
@@ -46,7 +43,7 @@ class OTPVerifySerializer(serializers.Serializer):
         try:
             user = User.objects.get(email=data['email'])
         except User.DoesNotExist:
-            raise NotFound("User not found.")
+            raise serializers.ValidationError("User not found.")
 
         if user.is_verified:
             raise serializers.ValidationError("Email already verified.")
@@ -93,7 +90,7 @@ class ResendOTPSerializer(serializers.Serializer):
         try:
             user = User.objects.get(email=data['email'])
         except User.DoesNotExist:
-            raise NotFound("User not found.")
+            raise serializers.ValidationError("User not found.")
 
         if user.is_verified:
             raise serializers.ValidationError("Email already verified.")
