@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from catalog.models import Brand, Model
+from cars.models import Brand, CarModel
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -9,13 +9,10 @@ class BrandSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at']
 
 
-class ModelsSerializer(serializers.ModelSerializer):
+class CarModelSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
 
     class Meta:
-        model = Model
-        fields = ['id', 'brand', 'name', 'created_at']  
+        model = CarModel
+        fields = ['id', 'brand', 'name', 'created_at']
         read_only_fields = ['created_at']
-
-class ModelByBrandQuerySerializer(serializers.Serializer):
-    brand_id = serializers.IntegerField(required=True)

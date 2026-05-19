@@ -1,5 +1,5 @@
 from django.contrib import admin
-from catalog.models import Brand, Model
+from cars.models import Brand, CarModel
 
 
 @admin.register(Brand)
@@ -8,8 +8,8 @@ class BrandAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
-@admin.register(Model)
-class ModelAdmin(admin.ModelAdmin):
+@admin.register(CarModel)
+class CarModelAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'brand', 'created_at']
     list_filter = ['brand']
     search_fields = ['name', 'brand__name']

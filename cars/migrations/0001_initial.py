@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('brand', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='models', to='catalog.brand')),
+                ('brand', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='models', to='cars.brand')),
             ],
             options={
                 'db_table': 'models',
