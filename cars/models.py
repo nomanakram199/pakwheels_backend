@@ -13,7 +13,7 @@ class Brand(TimeStampedModel):
 
 
 class CarModel(TimeStampedModel):
-    brand = models.ForeignKey(Brand, on_delete=models.PROTECT, related_name='models')
+    brand = models.ForeignKey(Brand, on_delete=models.PROTECT, related_name='car_models')
     name = models.CharField(max_length=100)
 
     class Meta:
