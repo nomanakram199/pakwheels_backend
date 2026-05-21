@@ -1,6 +1,5 @@
 from django.db import models
-from common.models import TimeStampedModel
-
+from django_extensions.db.models import TimeStampedModel
 
 class Brand(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)

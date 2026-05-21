@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from cars.models import Brand, CarModel
 
+from cars.models import Brand, CarModel
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
-        fields = ['id', 'name', 'created_at']
-        read_only_fields = ['created_at']
+        fields = ['id', 'name', 'created']
+        read_only_fields = ['created']
 
 
 class CarModelSerializer(serializers.ModelSerializer):
@@ -14,5 +14,5 @@ class CarModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CarModel
-        fields = ['id', 'brand', 'name', 'created_at']
-        read_only_fields = ['created_at']
+        fields = ['id', 'brand', 'name', 'created']
+        read_only_fields = ['created']

@@ -1,8 +1,10 @@
-from datetime import timedelta
 import logging
 import random
+from datetime import timedelta
+
 from django.utils import timezone
 from rest_framework import serializers
+
 from users.models import User
 
 logger = logging.getLogger(__name__)
@@ -110,4 +112,4 @@ class ResendOTPSerializer(serializers.Serializer):
 class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'phone_number', 'first_name', 'last_name', 'city', 'is_verified', 'created_at', 'updated_at']
+        fields = ['id', 'email', 'phone_number', 'first_name', 'last_name', 'city', 'is_verified', 'created', 'modified']

@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django_extensions.db.models import TimeStampedModel
 
 from users.managers import UserManager
-from common.models import TimeStampedModel
 
 class User(AbstractUser, TimeStampedModel):
     username = models.CharField(blank=True, null=True)
