@@ -16,3 +16,12 @@ class CarModelSerializer(serializers.ModelSerializer):
         model = CarModel
         fields = ['id', 'brand', 'name', 'created']
         read_only_fields = ['created']
+
+
+class BrandQuerySerializer(serializers.Serializer):
+    search = serializers.CharField(required=False, allow_blank=True,trim_whitespace=True)
+
+
+class CarModelQuerySerializer(serializers.Serializer):
+    search = serializers.CharField(required=False, allow_blank=True,trim_whitespace=True)
+    brand_id = serializers.IntegerField(required=False)

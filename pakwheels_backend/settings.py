@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'django_extensions',
+    'django_filters',
 ]
 
 CUSTOM_APPS = [

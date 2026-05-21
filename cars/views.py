@@ -2,23 +2,26 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from cars.filters import BrandFilter, CarModelFilter
 from cars.models import Brand, CarModel
 from cars.serializers import (
     BrandSerializer,
     CarModelSerializer,
+    CarModelQuerySerializer,
+    BrandQuerySerializer,
 )
 
 class BrandListAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        queryset = Brand.objects.all()
+        query_serializer = BrandQuerySerializer(data=request.query_params)
+        query_serializer.is_valid(raise_exception=True)
 
-        search = request.query_params.get('search','').strip()
-        if search:
-            queryset = queryset.filter(name__icontains=search)
-            
-        serializer = BrandSerializer(queryset, many=True)
+        queryset = Brand.objects.all()
+        brand_filter = BrandFilter(query_serializer.validated_data, queryset=queryset)
+
+        serializer = BrandSerializer(brand_filter.qs, many=True)
         return Response(serializer.data)
 
 
@@ -26,15 +29,11 @@ class ModelListAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        brand_id = request.query_params.get('brand_id')
-        search = request.query_params.get('search','').strip()
+        query_serializer = CarModelQuerySerializer(data=request.query_params)
+        query_serializer.is_valid(raise_exception=True)
+
         queryset = CarModel.objects.select_related('brand')
+        model_filter = CarModelFilter(query_serializer.validated_data, queryset=queryset)
 
-        if brand_id:
-            queryset = queryset.filter(brand_id=brand_id)
-
-        if search:
-            queryset = queryset.filter(name__icontains=search)
-
-        serializer = CarModelSerializer(queryset, many=True)
+        serializer = CarModelSerializer(model_filter.qs, many=True)
         return Response(serializer.data)
