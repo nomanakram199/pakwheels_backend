@@ -14,7 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 from decouple import config
 
-from pakwheels_backend.sendgrid import SENDGRID_API_KEY, EMAIL_BACKEND
+from pakwheels_backend.sendgrid import SENDGRID_API_KEY, EMAIL_BACKEND, DEFAULT_FROM_EMAIL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
