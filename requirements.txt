@@ -2,4 +2,10 @@ sqlparse==0.5.5
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
-
+django-extensions
+factory-boy
+django-filter
+redis
+celery
+django-sendgrid-v5
+python-decouple

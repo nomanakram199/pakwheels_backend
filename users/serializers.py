@@ -1,9 +1,12 @@
-from datetime import timedelta
 import logging
 import random
+from datetime import timedelta
+
 from django.utils import timezone
 from rest_framework import serializers
+
 from users.models import User
+from users.tasks import send_email_task
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +28,14 @@ class SignUpSerializer(serializers.ModelSerializer):
         otp = str(random.randint(100000, 999999))
         user.otp = otp
         user.otp_expires_at = timezone.now() + timedelta(minutes=5)
-        logger.info(f"OTP sent to email {user.email}: {otp}")
+        logger.info("OTP sent to email %s: %s", user.email, otp)
         user.save(update_fields=['otp', 'otp_expires_at'])
+        send_email_task.delay(
+            to_email=user.email,
+            subject="Verify your email",
+            template_name="emails/otp_email.html",
+            context={'first_name': user.first_name, 'otp': otp},
+        )
         return user
 
 
@@ -103,11 +112,17 @@ class ResendOTPSerializer(serializers.Serializer):
         otp = str(random.randint(100000, 999999))
         user.otp = otp
         user.otp_expires_at = timezone.now() + timedelta(minutes=10)
-        logger.info(f"OTP sent to email {user.email}: {otp}")
+        logger.info("OTP sent to email %s: %s", user.email, otp)
         user.save(update_fields=['otp', 'otp_expires_at'])
+        send_email_task.delay(
+            to_email=user.email,
+            subject="Your new OTP",
+            template_name="emails/otp_email.html",
+            context={'first_name': user.first_name, 'otp': otp},
+        )
 
 
 class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'phone_number', 'first_name', 'last_name', 'city', 'is_verified', 'created_at', 'updated_at']
+        fields = ['id', 'email', 'phone_number', 'first_name', 'last_name', 'city', 'is_verified', 'created', 'modified']
