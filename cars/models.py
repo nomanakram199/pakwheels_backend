@@ -1,5 +1,9 @@
+from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+
+from cars.choices import CAR_CONDITION_CHOICES
+
 
 class Brand(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
@@ -21,3 +25,42 @@ class CarModel(TimeStampedModel):
 
     def __str__(self):
         return f"{self.brand.name} {self.name}"
+
+
+class Car(TimeStampedModel):
+    model = models.ForeignKey(CarModel, on_delete=models.PROTECT, related_name='cars')
+    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cars')
+    year = models.IntegerField()
+    license_plate = models.CharField(max_length=20, unique=True)
+    city = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    condition = models.CharField(max_length=20, choices=CAR_CONDITION_CHOICES)
+    description = models.TextField(blank=True)
+    is_deleted = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'cars'
+        indexes = [
+            models.Index(fields=['seller_id']),
+            models.Index(fields=['is_deleted']),
+            models.Index(fields=['model_id']),
+        ]
+
+    def __str__(self):
+        return f"{self.model} ({self.year}) - {self.license_plate}"
+
+
+class Image(TimeStampedModel):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='cars/images/')
+    is_primary = models.BooleanField(default=False)
+    display_order = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'images'
+        indexes = [
+            models.Index(fields=['car_id']),
+        ]
+
+    def __str__(self):
+        return f"Image for {self.car.license_plate}"
