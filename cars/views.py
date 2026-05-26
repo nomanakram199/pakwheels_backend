@@ -1,7 +1,5 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from django.db import transaction
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import (
     CreateAPIView,
@@ -17,7 +15,6 @@ from rest_framework.response import Response
 
 from cars.filters import BrandFilter, CarFilter, CarModelFilter
 from cars.models import Brand, CarModel, Car
-from cars.mixins import CarQuerysetMixin
 from cars.permissions import IsSellerOrReadOnly
 from cars.serializers import (
     BrandSerializer,
@@ -45,12 +42,12 @@ class ModelListAPIView(ListAPIView):
     filterset_class = CarModelFilter
 
 
-class CarListCreateAPIView(CarQuerysetMixin, ListCreateAPIView):
+class CarListCreateAPIView(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = CarFilter
 
     def get_queryset(self):
-        return self.get_base_queryset()
+        return Car.objects.with_related()
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -66,11 +63,11 @@ class CarListCreateAPIView(CarQuerysetMixin, ListCreateAPIView):
         serializer.save(seller=self.request.user)
 
 
-class CarRetrieveUpdateDestroyAPIView(CarQuerysetMixin, RetrieveUpdateDestroyAPIView):
+class CarRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsSellerOrReadOnly]
 
     def get_queryset(self):
-        return self.get_base_queryset()
+        return Car.objects.with_related()
 
     def get_serializer_class(self):
         if self.request.method in {'PUT', 'PATCH'}:
@@ -79,19 +76,19 @@ class CarRetrieveUpdateDestroyAPIView(CarQuerysetMixin, RetrieveUpdateDestroyAPI
 
     def destroy(self, request, *args, **kwargs):
         car = self.get_object()
-        car.is_deleted = True
-        car.save(update_fields=['is_deleted'])
+        car.is_active = False
+        car.save(update_fields=['is_active'])
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class MyCarListAPIView(CarQuerysetMixin, ListAPIView):
+class MyCarListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CarListSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = CarFilter
 
     def get_queryset(self):
-        return self.get_base_queryset().filter(seller=self.request.user)
+        return Car.objects.with_related().filter(seller=self.request.user)
 
 
 class CarImageUploadAPIView(CreateAPIView):
@@ -102,7 +99,7 @@ class CarImageUploadAPIView(CreateAPIView):
     @transaction.atomic
     def perform_create(self, serializer):
         car = get_object_or_404(
-            Car.objects.filter(is_deleted=False).select_related('seller'),
+            Car.objects.select_related('seller'),
             pk=self.kwargs['pk'],
         )
         if car.seller_id != self.request.user.id:

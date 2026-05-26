@@ -30,14 +30,14 @@ class CarModelSerializer(serializers.ModelSerializer):
 class ImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ['id', 'car', 'image', 'is_primary', 'display_order', 'created', 'modified']
+        fields = ['id', 'car', 'image', 'is_primary', 'created', 'modified']
         read_only_fields = ['created', 'modified']
 
 
 class ImageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ['id', 'image', 'is_primary', 'display_order', 'created', 'modified']
+        fields = ['id', 'image', 'is_primary', 'created', 'modified']
         read_only_fields = ['id', 'created', 'modified']
 
 class CarListSerializer(serializers.ModelSerializer):
@@ -50,7 +50,7 @@ class CarListSerializer(serializers.ModelSerializer):
         model = Car
         fields = [
             'id', 'model', 'model_name', 'brand_name', 'seller', 'year', 'license_plate', 'city', 'price',
-            'condition', 'is_deleted', 'images', 'created', 'modified'
+            'condition', 'is_active', 'images', 'created', 'modified'
         ]
         read_only_fields = ['created', 'modified']
 
@@ -64,7 +64,7 @@ class CarDetailSerializer(serializers.ModelSerializer):
         model = Car
         fields = [
             'id', 'model', 'seller', 'year', 'license_plate', 'city', 'price',
-            'condition', 'description', 'is_deleted', 'images', 'created', 'modified'
+            'condition', 'description', 'is_active', 'images', 'created', 'modified'
         ]
         read_only_fields = ['created', 'modified']
 
