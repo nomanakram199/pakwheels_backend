@@ -26,4 +26,3 @@ class ActiveManager(models.Manager.from_queryset(ActiveQuerySet)):
 
     def only_inactive(self):
         return super().get_queryset().filter(is_active=False)
-
