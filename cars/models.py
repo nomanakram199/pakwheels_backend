@@ -5,7 +5,7 @@ from django_extensions.db.models import TimeStampedModel
 from cars.choices import CarCondition
 from cars.managers import CarManager
 from cars.validators import validate_car_year
-from core.model import SoftDeleteByActiveModel
+from core.mixins import SoftDeleteMixin
 
 
 class Brand(TimeStampedModel):
@@ -30,7 +30,7 @@ class CarModel(TimeStampedModel):
         return f"{self.brand.name} {self.name}"
 
 
-class Car(SoftDeleteByActiveModel, TimeStampedModel):
+class Car(SoftDeleteMixin, TimeStampedModel):
     objects = CarManager()
     all_objects = models.Manager()
 

@@ -1,9 +1,7 @@
 from django.db import models
 
-from core.managers import ActiveQuerySet
 
-
-class CarQuerySet(ActiveQuerySet):
+class CarQuerySet(models.QuerySet):
     def with_car_relations(self):
         return (
             self.select_related('model__brand', 'seller')

@@ -67,7 +67,7 @@ class CarRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsSellerOrReadOnly]
 
     def get_queryset(self):
-        return Car.objects.with_optimized_queries()
+        return Car.objects.with_car_relations()
 
     def get_serializer_class(self):
         if self.request.method in {'PUT', 'PATCH'}:
@@ -76,8 +76,7 @@ class CarRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         car = self.get_object()
-        car.is_active = False
-        car.save(update_fields=['is_active'])
+        car.soft_delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -88,7 +87,7 @@ class MyCarListAPIView(ListAPIView):
     filterset_class = CarFilter
 
     def get_queryset(self):
-        return Car.objects.with_optimized_queries().filter(seller=self.request.user)
+        return Car.objects.with_car_relations().filter(seller=self.request.user)
 
 
 class CarImageUploadAPIView(CreateAPIView):
