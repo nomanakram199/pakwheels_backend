@@ -47,7 +47,7 @@ class CarListCreateAPIView(ListCreateAPIView):
     filterset_class = CarFilter
 
     def get_queryset(self):
-        return Car.objects.with_related()
+        return Car.objects.with_car_relations()
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -67,7 +67,7 @@ class CarRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsSellerOrReadOnly]
 
     def get_queryset(self):
-        return Car.objects.with_related()
+        return Car.objects.with_optimized_queries()
 
     def get_serializer_class(self):
         if self.request.method in {'PUT', 'PATCH'}:
@@ -88,7 +88,7 @@ class MyCarListAPIView(ListAPIView):
     filterset_class = CarFilter
 
     def get_queryset(self):
-        return Car.objects.with_related().filter(seller=self.request.user)
+        return Car.objects.with_optimized_queries().filter(seller=self.request.user)
 
 
 class CarImageUploadAPIView(CreateAPIView):

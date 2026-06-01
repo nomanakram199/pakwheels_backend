@@ -1,24 +1,11 @@
-import datetime
-
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.core.exceptions import ValidationError
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
 from cars.choices import CarCondition
 from cars.managers import CarManager
-from common.model import SoftDeleteByActiveModel
-
-
-def current_year_plus_one():
-    return datetime.date.today().year + 1
-
-
-def validate_car_year(value):
-    current_year = datetime.date.today().year
-    if value < 1886 or value > current_year + 1:
-        raise ValidationError(f"Year must be between 1886 and {current_year + 1}.")
+from cars.validators import validate_car_year
+from core.model import SoftDeleteByActiveModel
 
 
 class Brand(TimeStampedModel):
@@ -58,15 +45,8 @@ class Car(SoftDeleteByActiveModel, TimeStampedModel):
         related_name='cars',
     )
 
-    year = models.IntegerField(
-        validators=[
-            MinValueValidator(1886),
-            MaxValueValidator(current_year_plus_one),
-        ]
-    )
-
+    year = models.IntegerField(validators=[validate_car_year])
     license_plate = models.CharField(max_length=20, unique=True)
-
     city = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=12, decimal_places=2)
     condition = models.CharField(max_length=20, choices=CarCondition.choices)
