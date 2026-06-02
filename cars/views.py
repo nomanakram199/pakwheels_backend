@@ -49,7 +49,7 @@ class ModelListAPIView(ListAPIView):
 class CarListCreateAPIView(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = CarFilter
-    queryset = Car.objects.with_car_relations()
+    queryset = Car.objects.car_relations_query()
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self):
@@ -62,7 +62,7 @@ class CarListCreateAPIView(ListCreateAPIView):
 
 
 class CarRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Car.objects.with_car_relations()
+    queryset = Car.objects.car_relations_query()
     permission_classes = [IsSellerOrReadOnly]
 
     def get_serializer_class(self):
@@ -81,7 +81,7 @@ class MyCarListAPIView(ListAPIView):
     filterset_class = CarFilter
 
     def get_queryset(self):
-        return Car.objects.with_car_relations().filter(
+        return Car.objects.car_relations_query().filter(
             seller=self.request.user
         )
 
