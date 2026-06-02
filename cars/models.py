@@ -34,9 +34,6 @@ class CarModel(TimeStampedModel):
 
 
 class Car(SoftDeleteMixin, TimeStampedModel):
-    objects = CarManager()
-    all_objects = models.Manager()
-
     model = models.ForeignKey(
         CarModel,
         on_delete=models.PROTECT,
@@ -54,6 +51,9 @@ class Car(SoftDeleteMixin, TimeStampedModel):
     price = models.DecimalField(max_digits=12, decimal_places=2)
     condition = models.CharField(max_length=20, choices=CarCondition.choices)
     description = models.TextField(blank=True)
+
+    objects = CarManager()
+    all_objects = models.Manager()
 
     class Meta:
         db_table = 'cars'
