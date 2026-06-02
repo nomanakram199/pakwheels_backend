@@ -53,7 +53,6 @@ class Car(SoftDeleteMixin, TimeStampedModel):
     description = models.TextField(blank=True)
 
     objects = CarManager()
-    all_objects = models.Manager()
 
     class Meta:
         db_table = 'cars'
