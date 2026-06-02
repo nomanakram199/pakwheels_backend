@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from cars.models import Brand, CarModel
+from cars.models import Brand, CarModel, Car, Image
 
 
 @admin.register(Brand)
@@ -15,4 +15,32 @@ class CarModelAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'brand', 'created', 'modified']
     list_filter = ['brand']
     search_fields = ['name', 'brand__name']
+    readonly_fields = ['created', 'modified']
+
+
+@admin.register(Car)
+class CarAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'model',
+        'seller',
+        'year',
+        'license_plate',
+        'city',
+        'price',
+        'condition',
+        'is_active',
+        'created',
+        'modified',
+    )
+    list_filter = ['model', 'seller', 'city', 'condition', 'is_active']
+    search_fields = ['model__name', 'seller__username', 'license_plate', 'city']
+    readonly_fields = ['created', 'modified']
+
+
+@admin.register(Image)
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ['id', 'car', 'image', 'is_primary', 'created', 'modified']
+    list_filter = ['car', 'is_primary']
+    search_fields = ['car__model__name', 'car__license_plate']
     readonly_fields = ['created', 'modified']

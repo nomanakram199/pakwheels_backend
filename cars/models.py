@@ -1,18 +1,25 @@
+from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
+from cars.choices import CarCondition
+from cars.managers import CarManager
+from core.mixins import SoftDeleteMixin
+
+
 class Brand(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        db_table = 'brands'
 
     def __str__(self):
         return self.name
 
 
 class CarModel(TimeStampedModel):
-    brand = models.ForeignKey(Brand, on_delete=models.PROTECT, related_name='car_models')
+    brand = models.ForeignKey(
+        Brand,
+        on_delete=models.PROTECT,
+        related_name='car_models',
+    )
     name = models.CharField(max_length=100)
 
     class Meta:
@@ -21,3 +28,37 @@ class CarModel(TimeStampedModel):
 
     def __str__(self):
         return f"{self.brand.name} {self.name}"
+
+
+class Car(SoftDeleteMixin, TimeStampedModel):
+    model = models.ForeignKey(
+        CarModel,
+        on_delete=models.PROTECT,
+        related_name='cars',
+    )
+    seller = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='cars',
+    )
+
+    year = models.IntegerField()
+    license_plate = models.CharField(max_length=20, unique=True)
+    city = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    condition = models.CharField(max_length=20, choices=CarCondition.choices)
+    description = models.TextField(blank=True)
+
+    objects = CarManager()
+
+    def __str__(self):
+        return f"{self.model} ({self.year}) - {self.license_plate}"
+
+
+class Image(TimeStampedModel):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='cars/images/')
+    is_primary = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Image for {self.car.license_plate}"
