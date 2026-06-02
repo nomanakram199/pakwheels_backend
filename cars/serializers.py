@@ -48,7 +48,7 @@ class CarListSerializer(serializers.ModelSerializer):
     brand_name = serializers.CharField(
         source='model.brand.name', read_only=True
     )
-    seller = SellerSerializer(source='seller', read_only=True)
+    seller = SellerSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
@@ -72,8 +72,8 @@ class CarListSerializer(serializers.ModelSerializer):
 
 
 class CarDetailSerializer(serializers.ModelSerializer):
-    model = CarModelSerializer(source='model', read_only=True)
-    seller = SellerSerializer(source='seller', read_only=True)
+    model = CarModelSerializer(read_only=True)
+    seller = SellerSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
