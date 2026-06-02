@@ -10,9 +10,6 @@ from core.mixins import SoftDeleteMixin
 class Brand(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
 
-    class Meta:
-        db_table = 'brands'
-
     def __str__(self):
         return self.name
 
@@ -54,14 +51,6 @@ class Car(SoftDeleteMixin, TimeStampedModel):
 
     objects = CarManager()
 
-    class Meta:
-        db_table = 'cars'
-        indexes = [
-            models.Index(fields=['seller_id']),
-            models.Index(fields=['is_active']),
-            models.Index(fields=['model_id']),
-        ]
-
     def __str__(self):
         return f"{self.model} ({self.year}) - {self.license_plate}"
 
@@ -70,12 +59,6 @@ class Image(TimeStampedModel):
     car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='cars/images/')
     is_primary = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'images'
-        indexes = [
-            models.Index(fields=['car_id']),
-        ]
 
     def __str__(self):
         return f"Image for {self.car.license_plate}"
