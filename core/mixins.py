@@ -8,6 +8,5 @@ class SoftDeleteMixin(models.Model):
         abstract = True
 
     def soft_delete(self):
-        
         self.is_active = False
         self.save(update_fields=['is_active'])

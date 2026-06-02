@@ -1,16 +1,20 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
-from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 
 from cars.filters import BrandFilter, CarFilter, CarModelFilter
@@ -45,14 +49,8 @@ class ModelListAPIView(ListAPIView):
 class CarListCreateAPIView(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = CarFilter
-
-    def get_queryset(self):
-        return Car.objects.with_car_relations()
-
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            return [IsAuthenticated()]
-        return [AllowAny()]
+    queryset = Car.objects.with_car_relations()
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -64,20 +62,16 @@ class CarListCreateAPIView(ListCreateAPIView):
 
 
 class CarRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Car.objects.with_car_relations()
     permission_classes = [IsSellerOrReadOnly]
-
-    def get_queryset(self):
-        return Car.objects.with_car_relations()
 
     def get_serializer_class(self):
         if self.request.method in {'PUT', 'PATCH'}:
             return CarCreateUpdateSerializer
         return CarDetailSerializer
 
-    def destroy(self, request, *args, **kwargs):
-        car = self.get_object()
-        car.soft_delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def perform_destroy(self, instance):
+        instance.soft_delete()
 
 
 class MyCarListAPIView(ListAPIView):
@@ -87,23 +81,26 @@ class MyCarListAPIView(ListAPIView):
     filterset_class = CarFilter
 
     def get_queryset(self):
-        return Car.objects.with_car_relations().filter(seller=self.request.user)
+        return Car.objects.with_car_relations().filter(
+            seller=self.request.user
+        )
 
 
 class CarImageUploadAPIView(CreateAPIView):
     serializer_class = ImageCreateSerializer
     parser_classes = [MultiPartParser, FormParser]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSellerOrReadOnly]
+
+    def get_car(self):
+        return get_object_or_404(
+            Car.objects.only('id', 'seller_id'),
+            pk=self.kwargs['pk'],
+        )
 
     @transaction.atomic
     def perform_create(self, serializer):
-        car = get_object_or_404(
-            Car.objects.select_related('seller'),
-            pk=self.kwargs['pk'],
-        )
-        if car.seller_id != self.request.user.id:
-            raise PermissionDenied("You can only upload images for your own cars.")
-
+        car = self.get_car()
+        self.check_object_permissions(self.request, car)
         image = serializer.save(car=car)
         if image.is_primary:
             car.images.exclude(id=image.id).update(is_primary=False)

@@ -4,7 +4,6 @@ from django_extensions.db.models import TimeStampedModel
 
 from cars.choices import CarCondition
 from cars.managers import CarManager
-from cars.validators import validate_car_year
 from core.mixins import SoftDeleteMixin
 
 
@@ -19,7 +18,11 @@ class Brand(TimeStampedModel):
 
 
 class CarModel(TimeStampedModel):
-    brand = models.ForeignKey(Brand, on_delete=models.PROTECT, related_name='car_models')
+    brand = models.ForeignKey(
+        Brand,
+        on_delete=models.PROTECT,
+        related_name='car_models',
+    )
     name = models.CharField(max_length=100)
 
     class Meta:
@@ -45,7 +48,7 @@ class Car(SoftDeleteMixin, TimeStampedModel):
         related_name='cars',
     )
 
-    year = models.IntegerField(validators=[validate_car_year])
+    year = models.IntegerField()
     license_plate = models.CharField(max_length=20, unique=True)
     city = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=12, decimal_places=2)

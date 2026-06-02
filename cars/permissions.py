@@ -1,4 +1,7 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import (
+    SAFE_METHODS,
+    BasePermission,
+)
 
 
 class IsSellerOrReadOnly(BasePermission):
@@ -6,8 +9,7 @@ class IsSellerOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        if not request.user or not request.user.is_authenticated:
+        if not request.user.is_authenticated:
             return False
 
         return getattr(obj, 'seller_id', None) == request.user.id
-
